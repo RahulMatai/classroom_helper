@@ -1,0 +1,66 @@
+classroom-companion/
+│
+├── app/                          ← All application code lives here
+│   │
+│   ├── agents/                   ← The 6 AI agents
+│   │   ├── __init__.py
+│   │   ├── safety.py             ← Filters every message first
+│   │   ├── router.py             ← Classifies intent
+│   │   ├── teacher.py            ← Assignment creation, feedback
+│   │   ├── student.py            ← Submissions, progress
+│   │   ├── parent.py             ← Digest + escalation only
+│   │   ├── reminder.py           ← Policy-driven nudges
+│   │   └── summariser.py         ← Cohort summaries
+│   │
+│   ├── channels/                 ← One adapter per channel
+│   │   ├── __init__.py
+│   │   ├── base.py               ← Canonical Message envelope (shared)
+│   │   ├── telegram.py           ← Telegram webhook handler
+│   │   ├── whatsapp.py           ← Twilio webhook handler
+│   │   └── web.py                ← SSE + WebSocket handler
+│   │
+│   ├── auth/                     ← Everything auth related
+│   │   ├── __init__.py
+│   │   ├── magic_link.py         ← Generate + verify magic links
+│   │   ├── jwt.py                ← Issue + verify JWT tokens
+│   │   └── dependencies.py       ← FastAPI auth middleware
+│   │
+│   ├── core/                     ← Shared infrastructure
+│   │   ├── __init__.py
+│   │   ├── config.py             ← All env vars loaded here
+│   │   ├── llm.py                ← Swappable LLM abstraction
+│   │   ├── events.py             ← Redis pub/sub event bus
+│   │   └── policy.py             ← RBAC + resource checks
+│   │
+│   ├── db/                       ← Database layer
+│   │   ├── __init__.py
+│   │   ├── models.py             ← All SQLAlchemy models
+│   │   ├── session.py            ← DB connection + session
+│   │   └── migrations/           ← Alembic migration files
+│   │
+│   ├── api/                      ← FastAPI route handlers
+│   │   ├── __init__.py
+│   │   ├── auth.py               ← /auth/magic-link, /auth/token
+│   │   ├── assignments.py        ← /assignments CRUD
+│   │   ├── submissions.py        ← /submissions routes
+│   │   ├── webhooks.py           ← /webhook/telegram, /webhook/whatsapp
+│   │   └── stream.py             ← /stream SSE live events
+│   │
+│   └── main.py                   ← FastAPI app entry point
+│
+├── tests/
+│   ├── __init__.py
+│   ├── test_auth.py              ← Magic link + JWT unit tests
+│   └── test_agents.py            ← Golden transcript evals
+│
+├── scripts/
+│   └── generate_keys.py          ← Generates RSA keys for JWT
+│
+├── .env                          ← Real secrets (never committed)
+├── .env.example                  ← Template (committed)
+├── .gitignore
+├── docker-compose.yml            ← Local Postgres + Redis
+├── requirements.txt
+├── alembic.ini                   ← Alembic config
+├── DOCUMENTATION.md              ← Living doc (we update as we go)
+└── README.md                     ← Final submission README

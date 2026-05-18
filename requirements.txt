@@ -1,0 +1,66 @@
+# ════════════════════════════════════════════════
+#   CLASSROOM COMPANION — Python Dependencies
+#   Install with: pip install -r requirements.txt
+# ════════════════════════════════════════════════
+
+# ── Web Framework ─────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+
+# ── Database ──────────────────────────────────────
+sqlalchemy==2.0.30
+alembic==1.13.1
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+
+# ── Redis ─────────────────────────────────────────
+redis==5.0.4
+
+# ── Auth ──────────────────────────────────────────
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography==42.0.7
+
+# ── LLM ───────────────────────────────────────────
+groq==0.9.0
+
+# ── Telegram ──────────────────────────────────────
+python-telegram-bot==21.3
+
+# ── WhatsApp (Twilio) ─────────────────────────────
+twilio==9.0.4
+
+# ── Supabase ──────────────────────────────────────
+supabase==2.4.6
+
+# ── Agent Orchestration ───────────────────────────
+langgraph==0.1.1
+langchain-core==0.2.5
+
+# ── Validation ────────────────────────────────────
+pydantic==2.7.1
+pydantic-settings==2.3.0
+email-validator==2.1.1
+
+# ── HTTP Client ───────────────────────────────────
+httpx==0.27.0
+requests==2.32.2
+
+# ── Environment ───────────────────────────────────
+python-dotenv==1.0.1
+
+# ── Scheduling (Reminder Agent) ───────────────────
+apscheduler==3.10.4
+
+# ── Logging ───────────────────────────────────────
+structlog==24.1.0
+
+# ── Testing ───────────────────────────────────────
+pytest==8.2.0
+pytest-asyncio==0.23.6
+httpx==0.27.0
+
+# ── Dev Tools ─────────────────────────────────────
+black==24.4.2
+flake8==7.0.0
