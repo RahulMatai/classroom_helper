@@ -1,0 +1,16 @@
+### Day 1
+- [x] Project structure created
+- [x] .env.example and .gitignore set up
+- [x] DOCUMENTATION.md started
+- [x] app/core/logger.py — structured logging with PII redaction
+- [x] app/core/config.py — environment variable management
+- [x] db/models.py — database schema
+- [ ] db/session.py — database connection
+- [ ] auth/jwt.py — JWT token management
+- [ ] auth/magic_link.py — passwordless auth
+- [ ] core/llm.py — Groq LLM abstraction
+- [ ] core/events.py — Redis pub/sub event bus
+- [ ] agents/ — all 6 agent skeletons
+- [ ] channels/base.py — canonical message envelope
+- [ ] channels/telegram.py — telegram bot
+- [ ] main.py — FastAPI entry point
