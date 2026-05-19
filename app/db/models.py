@@ -240,9 +240,21 @@ class User(Base):
                                    foreign_keys="Assignment.teacher_id")
     submissions     = relationship("Submission", back_populates="student",
                                    foreign_keys="Submission.student_id")
-    refresh_tokens  = relationship("RefreshToken",   back_populates="user")
-    channel_bindings = relationship("ChannelBinding", back_populates="user")
-    audit_logs      = relationship("AuditLog",   back_populates="user")
+    refresh_tokens = relationship(
+    "RefreshToken",
+    back_populates="user",
+    foreign_keys="RefreshToken.user_id"
+)
+    channel_bindings = relationship(
+    "ChannelBinding",
+    back_populates="user",
+    foreign_keys="ChannelBinding.user_id"
+)
+    audit_logs = relationship(
+    "AuditLog",
+    back_populates="user",
+    foreign_keys="AuditLog.user_id"
+)
     nudges          = relationship("Nudge",      back_populates="student",
                                    foreign_keys="Nudge.student_id")
 
@@ -619,6 +631,11 @@ class ChannelBinding(Base):
         UUID(as_uuid=False),
         primary_key=True,
         default=generate_uuid,
+        nullable=False
+    )
+    user_id = Column(
+        UUID(as_uuid=False),
+        ForeignKey("users.id"),
         nullable=False
     )
     
