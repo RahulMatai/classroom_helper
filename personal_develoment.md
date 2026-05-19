@@ -5,7 +5,7 @@
 - [x] app/core/logger.py — structured logging with PII redaction
 - [x] app/core/config.py — environment variable management
 - [x] db/models.py — database schema
-- [ ] db/session.py — database connection
+- [x] db/session.py — database connection
 - [ ] auth/jwt.py — JWT token management
 - [ ] auth/magic_link.py — passwordless auth
 - [ ] core/llm.py — Groq LLM abstraction
