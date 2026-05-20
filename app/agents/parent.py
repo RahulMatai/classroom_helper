@@ -62,14 +62,7 @@ def generate_weekly_digest(
 
     Called every Sunday by Reminder Agent cron job.
 
-    Args:
-        parent: Parent user object
-        student: Their child's user object
-        submissions: Student's submissions this week
-        assignments: All active assignments
-
-    Returns:
-        Plain language digest message
+  
     """
     llm = get_llm()
 
