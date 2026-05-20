@@ -54,7 +54,7 @@ def normalise_telegram_message(update: Update) -> CanonicalMessage:
         text = message.caption or "[File]"
     else:
         msg_type = MessageType.TEXT
-        text = message or ""
+        text = message.text or ""
     return CanonicalMessage(
         message_id= str(message.message_id),
         channel="Telegram",
