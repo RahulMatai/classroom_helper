@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classroom Companion</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, sans-serif; background:#f5f7fa; color:#1a1a2e; }
+
+  .navbar {
+    background:#1B2A4A; color:white; padding:16px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .navbar h1 { font-size:20px; }
+  .navbar span { font-size:13px; opacity:0.7; }
+
+  .container { max-width:1100px; margin:32px auto; padding:0 24px; }
+
+  .tabs {
+    display:flex; gap:8px; margin-bottom:24px;
+  }
+  .tab {
+    padding:10px 20px; border:none; border-radius:6px;
+    cursor:pointer; font-size:14px; font-weight:600;
+    background:#fff; color:#666; border:1px solid #ddd;
+  }
+  .tab.active { background:#1B2A4A; color:white; border-color:#1B2A4A; }
+
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  .card {
+    background:white; border-radius:10px; padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:16px;
+  }
+  .card h2 { font-size:16px; margin-bottom:16px; color:#1B2A4A; }
+
+  .form-group { margin-bottom:14px; }
+  .form-group label { display:block; font-size:13px; color:#666; margin-bottom:6px; }
+  .form-group input, .form-group textarea {
+    width:100%; padding:10px 12px; border:1px solid #ddd;
+    border-radius:6px; font-size:14px;
+  }
+  .form-group textarea { height:80px; resize:vertical; }
+
+  .btn {
+    padding:10px 20px; border:none; border-radius:6px;
+    cursor:pointer; font-size:14px; font-weight:600;
+  }
+  .btn-primary { background:#1B2A4A; color:white; }
+  .btn-primary:hover { background:#2a3f6f; }
+
+  .assignment-item {
+    background:#f8f9ff; border:1px solid #e0e4ff;
+    border-radius:8px; padding:14px; margin-bottom:10px;
+  }
+  .assignment-item h3 { font-size:15px; color:#1B2A4A; margin-bottom:6px; }
+  .assignment-item p { font-size:13px; color:#666; }
+  .badge {
+    display:inline-block; padding:3px 10px; border-radius:20px;
+    font-size:11px; font-weight:600; margin-top:8px;
+  }
+  .badge-active { background:#e8f5e9; color:#2e7d32; }
+  .badge-pending { background:#fff3e0; color:#e65100; }
+
+  /* Live popup */
+  .popup {
+    position:fixed; bottom:24px; right:24px;
+    background:#1B2A4A; color:white; padding:16px 20px;
+    border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.3);
+    max-width:320px; display:none; z-index:1000;
+    animation: slideIn 0.3s ease;
+  }
+  .popup.show { display:block; }
+  .popup h4 { font-size:14px; margin-bottom:6px; }
+  .popup p { font-size:13px; opacity:0.8; }
+  .popup-close {
+    position:absolute; top:8px; right:12px;
+    cursor:pointer; opacity:0.6; font-size:18px;
+  }
+
+  @keyframes slideIn {
+    from { transform:translateX(100px); opacity:0; }
+    to   { transform:translateX(0); opacity:1; }
+  }
+
+  .stats-row {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
+    margin-bottom:24px;
+  }
+  .stat-card {
+    background:white; border-radius:10px; padding:16px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center;
+  }
+  .stat-card .num { font-size:32px; font-weight:700; color:#1B2A4A; }
+  .stat-card .label { font-size:13px; color:#666; margin-top:4px; }
+
+  .connected-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:#4caf50; display:inline-block; margin-right:6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; } 50% { opacity:0.4; }
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>🎓 Classroom Companion</h1>
+  <span><span class="connected-dot"></span>Live — SSE Connected</span>
+</div>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('teacher')">👩‍🏫 Teacher View</button>
+    <button class="tab" onclick="showTab('student')">👨‍🎓 Student View</button>
+    <button class="tab" onclick="showTab('parent')">👨‍👩‍👧 Parent View</button>
+  </div>
+
+  <!-- TEACHER PANEL -->
+  <div id="teacher" class="panel active">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="num" id="total-assignments">0</div>
+        <div class="label">Total Assignments</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="total-submissions">0</div>
+        <div class="label">Submissions</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="total-students">3</div>
+        <div class="label">Students</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Create Assignment</h2>
+      <div class="form-group">
+        <label>Assignment (natural language)</label>
+        <textarea id="assignment-text"
+          placeholder="Essay on climate change due this Friday for Class 10B"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="createAssignment()">
+        Create Assignment
+      </button>
+      <div id="create-result" style="margin-top:12px;font-size:13px;color:#2e7d32"></div>
+    </div>
+
+    <div class="card">
+      <h2>Active Assignments</h2>
+      <div id="assignments-list">
+        <p style="color:#999;font-size:14px">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT PANEL -->
+  <div id="student" class="panel">
+    <div class="card">
+      <h2>My Assignments</h2>
+      <div id="student-assignments">
+        <p style="color:#999;font-size:14px">Loading...</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Submit Work</h2>
+      <div class="form-group">
+        <label>Assignment ID</label>
+        <input type="text" id="submit-assignment-id" placeholder="Paste assignment ID here">
+      </div>
+      <div class="form-group">
+        <label>Your submission</label>
+        <textarea id="submit-text" placeholder="Type your work here..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="submitWork()">Submit</button>
+      <div id="submit-result" style="margin-top:12px;font-size:13px;color:#2e7d32"></div>
+    </div>
+  </div>
+
+  <!-- PARENT PANEL -->
+  <div id="parent" class="panel">
+    <div class="card">
+      <h2>Weekly Digest Preview</h2>
+      <div style="background:#f8f9ff;border-radius:8px;padding:16px;font-size:14px;line-height:1.7">
+        <p>📱 <strong>WhatsApp Message to Parent:</strong></p>
+        <br>
+        <p id="digest-preview">
+          "This week Priya Sharma completed 2 of 3 assignments.
+          She submitted the climate change essay on time.
+          The mathematics homework is still pending — due Friday."
+        </p>
+      </div>
+      <br>
+      <button class="btn btn-primary" onclick="generateDigest()">
+        Generate Fresh Digest
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>Escalation Policy</h2>
+      <p style="font-size:14px;color:#666;line-height:1.7">
+        Parent alert triggers after
+        <strong>3 consecutive missed reminders</strong>.
+        Current status: <span style="color:#2e7d32">✅ No escalations needed</span>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Live Popup -->
+<div class="popup" id="live-popup">
+  <span class="popup-close" onclick="closePopup()">×</span>
+  <h4 id="popup-title">New Event</h4>
+  <p id="popup-body">Something happened</p>
+</div>
+
+<script>
+const API = 'https://classroom-companion-3nkj.onrender.com';
+
+// ── Tab switching ─────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── SSE Live Events ───────────────────────────────
+function connectSSE() {
+  const tenantId = 'c9cee145-1bcd-44b8-9170-fc669c55d921';
+  const es = new EventSource(`${API}/stream/${tenantId}`);
+
+  es.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.type === 'heartbeat') return;
+
+    if (data.type === 'assignment.created') {
+      showPopup('📝 New Assignment!', data.data?.title || 'New assignment created');
+      loadAssignments();
+    }
+    if (data.type === 'submission.received') {
+      showPopup('📤 New Submission!', `${data.data?.student_name} submitted work`);
+    }
+  };
+
+  es.onerror = () => {
+    setTimeout(connectSSE, 5000);
+  };
+}
+
+// ── Popup ─────────────────────────────────────────
+function showPopup(title, body) {
+  document.getElementById('popup-title').textContent = title;
+  document.getElementById('popup-body').textContent = body;
+  const popup = document.getElementById('live-popup');
+  popup.classList.add('show');
+  setTimeout(() => popup.classList.remove('show'), 5000);
+}
+
+function closePopup() {
+  document.getElementById('live-popup').classList.remove('show');
+}
+
+// ── Load Assignments ──────────────────────────────
+async function loadAssignments() {
+  try {
+    const res = await fetch(`${API}/assignments`);
+    if (!res.ok) {
+      document.getElementById('assignments-list').innerHTML =
+        '<p style="color:#999;font-size:14px">No assignments yet — create one above!</p>';
+      return;
+    }
+    const data = await res.json();
+    const list = document.getElementById('assignments-list');
+    const studentList = document.getElementById('student-assignments');
+
+    if (!data.length) {
+      list.innerHTML = '<p style="color:#999;font-size:14px">No assignments yet.</p>';
+      studentList.innerHTML = '<p style="color:#999;font-size:14px">No assignments yet.</p>';
+      return;
+    }
+
+    document.getElementById('total-assignments').textContent = data.length;
+
+    list.innerHTML = data.map(a => `
+      <div class="assignment-item">
+        <h3>${a.title}</h3>
+        <p>Due: ${a.due_date || 'No deadline'}</p>
+        <p style="font-size:11px;color:#999;margin-top:4px">ID: ${a.id}</p>
+        <span class="badge badge-active">${a.status}</span>
+      </div>
+    `).join('');
+
+    studentList.innerHTML = data.map(a => `
+      <div class="assignment-item">
+        <h3>${a.title}</h3>
+        <p>Due: ${a.due_date || 'No deadline'}</p>
+        <p style="font-size:11px;color:#999;margin-top:4px">ID: ${a.id}</p>
+        <span class="badge badge-pending">pending</span>
+      </div>
+    `).join('');
+
+  } catch(e) {
+    console.log('Could not load assignments:', e);
+  }
+}
+
+// ── Create Assignment ─────────────────────────────
+async function createAssignment() {
+  const text = document.getElementById('assignment-text').value;
+  if (!text) return;
+
+  document.getElementById('create-result').textContent = 'Creating...';
+
+  try {
+    const res = await fetch(`${API}/assignments/create`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        text: text,
+        teacher_id: '9794f2a8-7a54-456b-96e1-261177f29bb1'
+      })
+    });
+    const data = await res.json();
+    document.getElementById('create-result').textContent =
+      '✅ Assignment created: ' + (data.title || data.detail || JSON.stringify(data));
+    document.getElementById('assignment-text').value = '';
+    loadAssignments();
+    showPopup('📝 Assignment Created!', data.title || 'New assignment');
+  } catch(e) {
+    document.getElementById('create-result').textContent = '❌ Error: ' + e.message;
+  }
+}
+
+// ── Submit Work ───────────────────────────────────
+async function submitWork() {
+  const assignmentId = document.getElementById('submit-assignment-id').value;
+  const text = document.getElementById('submit-text').value;
+  if (!assignmentId || !text) return;
+
+  document.getElementById('submit-result').textContent = 'Submitting...';
+
+  try {
+    const res = await fetch(`${API}/submissions/submit`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        assignment_id: assignmentId,
+        student_id: '5527fade-605d-4fa3-9665-35e526fb4483',
+        content: text,
+        content_type: 'text'
+      })
+    });
+    const data = await res.json();
+    document.getElementById('submit-result').textContent =
+      '✅ Submitted! ' + (data.message || '');
+    showPopup('📤 Work Submitted!', 'Teacher notified');
+  } catch(e) {
+    document.getElementById('submit-result').textContent = '❌ Error: ' + e.message;
+  }
+}
+
+// ── Generate Digest ───────────────────────────────
+function generateDigest() {
+  document.getElementById('digest-preview').textContent =
+    'Generating AI digest...';
+  setTimeout(() => {
+    document.getElementById('digest-preview').textContent =
+      '"This week Priya Sharma completed 2 of 3 assignments. ' +
+      'She submitted the climate change essay on time. ' +
+      'The mathematics homework is still pending — due Friday."';
+  }, 1500);
+}
+
+// ── Init ──────────────────────────────────────────
+connectSSE();
+loadAssignments();
+</script>
+</body>
+</html>

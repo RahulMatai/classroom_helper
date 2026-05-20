@@ -21,9 +21,11 @@ from app.core.logger import setup_logging, get_logger
 from app.core.events import check_redis_connection
 from app.db.session import check_db_connection, create_tables
 from app.channels.telegram import create_telegram_app
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
 
 log = get_logger(__name__)
-
 
 # ── Lifespan ──────────────────────────────────────
 # Runs on startup and shutdown
@@ -186,3 +188,8 @@ async def stream_events(tenant_id: str, request: Request):
             "X-Accel-Buffering": "no"
         }
     )
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+@app.get("/dashboard")
+async def dashboard():
+    return FileResponse("app/static/index.html")
