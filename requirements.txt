@@ -2,7 +2,8 @@
 #   CLASSROOM COMPANION — Python Dependencies
 #   Install with: pip install -r requirements.txt
 # ════════════════════════════════════════════════
-
+pydantic-core==2.18.2
+pydantic==2.7.1
 # ── Web Framework ─────────────────────────────────
 fastapi==0.111.0
 uvicorn[standard]==0.29.0
@@ -39,7 +40,7 @@ langgraph==0.1.1
 langchain-core==0.2.5
 
 # ── Validation ────────────────────────────────────
-pydantic==2.7.1
+
 pydantic-settings==2.3.0
 email-validator==2.1.1
 
