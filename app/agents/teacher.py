@@ -81,8 +81,8 @@ def parse_assignment_from_text(
                   error=str(e),
                   exc_info=True)
         return {
-            "title": raw_text[:100],
-            "description": raw_text,
+           "title": str(raw_text)[:100],
+            "description": str(raw_text),
             "due_date": None,
             "target_type": "class"
         }
@@ -101,6 +101,8 @@ def create_assignment(
     3. Publish event to Redis
     4. Log to audit trail
     """
+    raw_text = str(raw_text)
+    
     # Parse natural language
     parsed = parse_assignment_from_text(raw_text, teacher)
 
