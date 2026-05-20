@@ -116,55 +116,37 @@ async def health():
     }
 
 
-@app.post("/webhook/telegram")
-async def telegram_webhook(request: Request):
-    """
-    Receive webhook updates from Telegram.
-    Telegram sends every message here.
-
-    Security:
-    Telegram includes secret_token in header.
-    We verify it before processing.
-    """
-    # Verify secret token
-  # Create telegram app once at module level
 telegram_app = create_telegram_app()
 
 @app.post("/webhook/telegram")
 async def telegram_webhook(request: Request):
-    """
-    Receive webhook updates from Telegram.
-    """
+    """Receive webhook updates from Telegram."""
+    
     # Verify secret token
     secret = request.headers.get("X-Telegram-Bot-Api-Secret-Token")
     if secret != settings.TELEGRAM_WEBHOOK_SECRET:
-        log.warning("invalid_telegram_webhook_secret")
+        log.warning("invalid_telegram_webhook_secret",
+                    received=secret,
+                    expected=settings.TELEGRAM_WEBHOOK_SECRET)
         return JSONResponse(
             status_code=403,
             content={"error": "Invalid secret"}
         )
 
-    try:
-        body = await request.json()
+    body = await request.json()
+    log.info("telegram_webhook_received", body=str(body)[:100])
 
-        from telegram import Update
-        # Initialize app if not already initialized
-        if not telegram_app.running:
-            await telegram_app.initialize()
+    from telegram import Update
+    if not telegram_app.running:
+        await telegram_app.initialize()
 
-        update = Update.de_json(body, telegram_app.bot)
-        await telegram_app.process_update(update)
+    update = Update.de_json(body, telegram_app.bot)
+    await telegram_app.process_update(update)
 
-        return {"ok": True}
+    return JSONResponse(content={"ok": True})
 
-    except Exception as e:
-        log.error("telegram_webhook_failed",
-                  error=str(e),
-                  exc_info=True)
-        return JSONResponse(
-            status_code=500,
-            content={"error": str(e)}
-        )
+
+
 
 @app.get("/stream/{tenant_id}")
 async def stream_events(tenant_id: str, request: Request):
